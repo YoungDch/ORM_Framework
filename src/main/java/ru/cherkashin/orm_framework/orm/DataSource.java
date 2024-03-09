@@ -8,17 +8,15 @@ import java.util.logging.Logger;
 
 public class DataSource {
 
-    static String url = "jdbc:postgresql://localhost/tasksystem";
-
-    public static Connection dataConnection = null;
+    private static Connection dataConnection = null;
 
     public static Connection getInstance(){
         if(dataConnection == null){
             Properties props = new Properties();
-            props.setProperty("user", "postgres");
-            props.setProperty("password", "7794");
+            props.setProperty("user", ORMProperty.userDataBase);
+            props.setProperty("password", ORMProperty.passwordDataBase);
             try {
-                dataConnection = DriverManager.getConnection(url, props);
+                dataConnection = DriverManager.getConnection(ORMProperty.urlDataBase, props);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

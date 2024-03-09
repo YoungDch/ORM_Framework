@@ -1,9 +1,9 @@
 package ru.cherkashin.orm_framework.orm;
 
+import ru.cherkashin.orm_framework.orm.exceptionORM.InvalidORMException;
 import ru.cherkashin.orm_framework.orm.interfaceORM.AnnotationORM;
 import ru.cherkashin.orm_framework.orm.interfaceORM.ColumnDescriptionORM;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -11,40 +11,38 @@ import java.util.Map;
 
 public class ORMService {
 
+    private final DataRepository dataRepository;
+
+    public ORMService(DataRepository dataRepository) {
+        this.dataRepository = dataRepository;
+    }
+
     public <T> T getValueOnIndex(int index, Class<T> classObject){
         String tableName = getTableName(classObject);
         Map<String, String> fieldsParams = getStructColumnOnFields(classObject);
 
-        DataRepository dataRepository = new DataRepository();
-        Object obj = dataRepository.readObjectAsOrm(tableName, index, fieldsParams, classObject);
-
-        return (T) obj;
+        return (T) dataRepository.read(tableName, index, fieldsParams, classObject);
     }
 
     public <T> List<?> getListValue(Class<T> classObject){
         String tableName = getTableName(classObject);
         Map<String, String> fieldsParams = getStructColumnOnFields(classObject);
 
-        DataRepository dataRepository = new DataRepository();
-        List<?> ListObj = dataRepository.readAllTable(tableName, fieldsParams, classObject);
-
-        return ListObj;
+        return dataRepository.readTable(tableName, fieldsParams, classObject);
     }
 
     public <T> boolean addNewValue(T objValue, Class<T> classObject){
         String tableName = getTableName(classObject);
-        DataRepository dataRepository = new DataRepository();
 
-        return dataRepository.addNewValue(tableName, objValue);
+        return dataRepository.add(tableName, objValue);
     }
 
     private <T> String getTableName(Class<T> classObject){
-        Annotation[] annotations = classObject.getAnnotations();
+        AnnotationORM annotation = classObject.getAnnotation(AnnotationORM.class);
         String tableName = null;
-        for(Annotation annotation : annotations){
-            if(annotation instanceof AnnotationORM){
-                tableName = ((AnnotationORM) annotation).nameTable();
-            }
+        if(annotation != null) tableName = annotation.nameTable();
+        if(tableName == null){
+            throw new InvalidORMException();
         }
         return tableName;
     }
@@ -53,14 +51,9 @@ public class ORMService {
         Field[] fields = classObject.getFields();
         HashMap<String, String> fieldsParams = new HashMap<>();
         for(Field field : fields){
-            Annotation[] fieldAnnotations = field.getAnnotations();
-            for(Annotation annotation : fieldAnnotations){
-                if(annotation instanceof ColumnDescriptionORM){
-                    fieldsParams.put(field.getName(), ((ColumnDescriptionORM) annotation).name());
-                }
-            }
+            ColumnDescriptionORM fieldAnnotation = field.getAnnotation(ColumnDescriptionORM.class);
+            if(fieldAnnotation != null) fieldsParams.put(field.getName(), fieldAnnotation.name());
         }
         return fieldsParams;
     }
-
 }
