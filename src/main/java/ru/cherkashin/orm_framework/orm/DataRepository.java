@@ -28,11 +28,12 @@ public class DataRepository implements DataRepositoryORM {
             ResultSet resultSet = statement.getResultSet();
 
             obj = classObject.newInstance();
-            Field[] fields = obj.getClass().getFields();
+            Field[] fields = obj.getClass().getDeclaredFields();
 
             while (resultSet.next()){
                 for(Map.Entry<String, String> entry : fieldsParam.entrySet()){
                     for(Field field : fields){
+                        field.setAccessible(true);
                         if(field.getName().equals(entry.getKey())){
                             String strResult = resultSet.getString(entry.getValue());
                             if(field.getType().toString().toLowerCase().equals("int")){
@@ -65,10 +66,11 @@ public class DataRepository implements DataRepositoryORM {
 
             while (resultSet.next()){
                 Object obj = classObject.newInstance();
-                Field[] fields = obj.getClass().getFields();
+                Field[] fields = obj.getClass().getDeclaredFields();
 
                 for(Map.Entry<String, String> entry : fieldsParam.entrySet()){
                     for(Field field : fields){
+                        field.setAccessible(true);
                         if(field.getName().equals(entry.getKey())){
                             String strResult = resultSet.getString(entry.getValue());
                             if(field.getType().toString().equals("int")){
@@ -94,8 +96,9 @@ public class DataRepository implements DataRepositoryORM {
     public <T> boolean add(String tableName, T objValue) {
         List<String> stringParamsList = new ArrayList<>();
         List<String> stringValuesList = new ArrayList<>();
-        Field[] fields = objValue.getClass().getFields();
+        Field[] fields = objValue.getClass().getDeclaredFields();
         for(Field field : fields){
+            field.setAccessible(true);
             ColumnDescriptionORM annotationsField = field.getAnnotation(ColumnDescriptionORM.class);
             if(annotationsField != null){
                 if(annotationsField.generatedId() != ORMGenerateId.AUTO_GENERATED){

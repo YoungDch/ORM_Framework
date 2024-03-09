@@ -31,8 +31,8 @@ public class ORMService {
         return dataRepository.readTable(tableName, fieldsParams, classObject);
     }
 
-    public <T> boolean addNewValue(T objValue, Class<T> classObject){
-        String tableName = getTableName(classObject);
+    public <T> boolean addNewValue(T objValue){
+        String tableName = getTableName(objValue.getClass());
 
         return dataRepository.add(tableName, objValue);
     }
@@ -48,7 +48,7 @@ public class ORMService {
     }
 
     private <T> HashMap<String, String> getStructColumnOnFields(Class<T> classObject){
-        Field[] fields = classObject.getFields();
+        Field[] fields = classObject.getDeclaredFields();
         HashMap<String, String> fieldsParams = new HashMap<>();
         for(Field field : fields){
             ColumnDescriptionORM fieldAnnotation = field.getAnnotation(ColumnDescriptionORM.class);
