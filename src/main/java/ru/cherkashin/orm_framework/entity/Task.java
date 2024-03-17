@@ -2,10 +2,11 @@ package ru.cherkashin.orm_framework.entity;
 
 import ru.cherkashin.orm_framework.orm.enumORM.ORMGenerateId;
 import ru.cherkashin.orm_framework.orm.interfaceORM.AnnotationORM;
+import ru.cherkashin.orm_framework.orm.interfaceORM.ORMObject;
 import ru.cherkashin.orm_framework.orm.interfaceORM.ColumnDescriptionORM;
 
 @AnnotationORM(nameTable = "tasks")
-public class Task {
+public class Task implements ORMObject {
     @ColumnDescriptionORM(name = "id", generatedId = ORMGenerateId.AUTO_GENERATED)
     private int id;
 
@@ -17,6 +18,17 @@ public class Task {
 
     @ColumnDescriptionORM(name = "info")
     private String info;
+
+    @ColumnDescriptionORM(name = "authorid", thisORMObject = true)
+    private User author;
+
+    public Task(){
+        this.author = new User();
+    }
+
+    public User getAuthor() {
+        return author;
+    }
 
     public int getId() {
         return id;
@@ -46,6 +58,10 @@ public class Task {
         this.info = info;
     }
 
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
@@ -53,6 +69,17 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", status='" + status + '\'' +
                 ", info='" + info + '\'' +
+                ", author=" + author.toString() +
                 '}';
+    }
+
+    @Override
+    public int getIdForORM() {
+        return id;
+    }
+
+    @Override
+    public void setIdForORM(int id) {
+        this.id = id;
     }
 }

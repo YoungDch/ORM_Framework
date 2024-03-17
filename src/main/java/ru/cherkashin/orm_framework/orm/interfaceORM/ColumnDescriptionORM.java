@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ColumnDescriptionORM {
-    String name();
+    String name() default "";
     ORMGenerateId generatedId() default ORMGenerateId.NOT_AUTO;
+    boolean thisORMObject() default false;
 }

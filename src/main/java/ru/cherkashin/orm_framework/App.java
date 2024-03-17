@@ -1,25 +1,29 @@
 package ru.cherkashin.orm_framework;
 
 import ru.cherkashin.orm_framework.entity.Task;
+import ru.cherkashin.orm_framework.entity.User;
 import ru.cherkashin.orm_framework.orm.DataRepository;
+import ru.cherkashin.orm_framework.orm.DataSource;
 import ru.cherkashin.orm_framework.orm.ORMService;
 
 public class App 
 {
     public static void main( String[] args )
     {
+
         ORMService ormService = new ORMService(new DataRepository());
-        var list = ormService.getListValue(Task.class);
-        System.out.println(list);
 
         Task task = new Task();
-        task.setName("Create new framework");
-        task.setStatus("Development");
-        task.setInfo("New developer should make new service");
+        task.setName("DELETE any user");
+        task.setStatus("Progress");
+        task.setInfo("Delete users pleas");
 
-        boolean result = ormService.addNewValue(task);
-        if(result){
-            System.out.println("Object " + task.toString() + " adding");
-        }
+        var author = ormService.getValueOnIndex(1, User.class);
+        task.setAuthor(author);
+
+        ormService.addNewValue(task);
+
+        DataSource.closeConnection();
+
     }
 }
